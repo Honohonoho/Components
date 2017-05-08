@@ -2,7 +2,7 @@
 <html>
 <head>
   <meta charset="utf-8">
-  <title>图片懒加载</title>
+  <title>曝光加载</title>
   <style>
     ul,li{
       list-style:none;
@@ -88,6 +88,7 @@
     this.bind();
     this.check();
   }
+
   Exposure.prototype.bind = function(){
     var _this = this;
     $(window).on('scroll',function(){
@@ -113,6 +114,11 @@
     }
   }
 
+  function showImg($img){
+    var imgUrl = $img.attr('data-src');
+    $img.attr('src',imgUrl);
+  }
+
   var Lazy = (function(){
     return {
       init: function($targets,callback){
@@ -127,10 +133,7 @@
     showImg($node);
   });
 
-  function showImg($img){
-    var imgUrl = $img.attr('data-src');
-    $img.attr('src',imgUrl);
-  }
+  
 
 </script>
 </body>
