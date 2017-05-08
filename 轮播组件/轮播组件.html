@@ -123,6 +123,41 @@
     </div>
   </div>
 
+  <div class="carousel">
+  <ul class="img-list">
+    <li data-index=0>
+      <a href="">
+        <img src="http://cdn.jirengu.com/book.jirengu.com/img/2.jpg" alt="2.jpg">
+      </a>
+    </li>
+    <li data-index=1>
+      <a href="">
+        <img src="http://cdn.jirengu.com/book.jirengu.com/img/3.jpg" alt="3.jpg">
+      </a>
+    </li>
+    <li data-index=2>
+      <a href="">
+        <img src="http://cdn.jirengu.com/book.jirengu.com/img/4.jpg" alt="4.jpg">
+      </a>
+    </li>
+    <li data-index=3>
+      <a href="">
+        <img src="http://cdn.jirengu.com/book.jirengu.com/img/5.jpg" alt="5.jpg">
+      </a>
+    </li>
+  </ul>
+    <a class="btn btn-pre" href="">&lt;</a>
+    <a class="btn btn-next" href="">&gt;</a>
+    <div class="dot-list">
+      <ul class="dot">
+        <li class="active"></li>
+        <li></li>
+        <li></li>
+        <li></li>
+      </ul>      
+    </div>
+  </div>
+
   <script src="https://apps.bdimg.com/libs/jquery/1.9.1/jquery.js"></script>
   <script>
       function Carousel($ct){
@@ -132,15 +167,14 @@
       }
 
       Carousel.prototype.init = function(){ //初始化函数
-        //局部变量↓-------属性↓
         var $imgList = this.$imgList = this.$ct.find('.img-list'),
             $btnPre = this.$btnPre = this.$ct.find('.btn-pre'),
             $btnNext = this.$btnNext = this.$ct.find('.btn-next'),
             $dot = this.$dot = this.$ct.find('.dot'),
             $dotChild = this.$dotChild = this.$ct.find('.dot li'),  
             $firstImg = $imgList.find('li').first(),
-            $lastImg = $imgList.find('li').last();
-            $imgWidth = $firstImg.width();
+            $lastImg = $imgList.find('li').last(),
+            $imgWidth = this.$imgWidth = $firstImg.width();
 
         this.imgLength = $imgList.children().length; //在clone()之前定义
         this.curPageIndex = 0;
@@ -157,64 +191,66 @@
         var _this = this;
         this.$btnPre.on('click',function(e){
           e.preventDefault(); //阻止a链接默认跳转刷新
-          _this.playPre(1);
+          _this.playPre();
         })
 
         this.$btnNext.on('click',function(e){
           e.preventDefault();
-          _this.playNext(1);
+          _this.playNext();
         })
 
         this.$dotChild.on('click',function(){
-          var dotIndex = $(_this).index();
+          var dotIndex = $(this).index();
           if(dotIndex > _this.curPageIndex){
             _this.playNext(dotIndex - _this.curPageIndex);
           }else if(dotIndex < _this.curPageIndex){
             _this.playPre(_this.curPageIndex - dotIndex);
           } 
         })
-
       }
 
       Carousel.prototype.playPre = function(n){
         var _this = this;
+        var n = n || 1;
         if(this.isAnimate) return; //状态锁，防止重复点击
         this.isAnimate = true;
         this.$imgList.animate({
-          left: '+=' + $imgWidth*n //不相邻的图片距离
+          left: '+=' + this.$imgWidth*n //不相邻的图片距离
         },function(){
           _this.curPageIndex -= n;
-          if(_this.curPageIndex === -1){ //当滚到第一张之前
-            _this.$imgList.css({'left': -(_this.imgLength*$imgWidth)}); //回到最后一张图片
+          if(_this.curPageIndex < 0){ //当滚到第一张之前
+            _this.$imgList.css({'left': -(_this.imgLength*_this.$imgWidth)}); //回到最后一张图片
             _this.curPageIndex = _this.imgLength - 1;
           }
+          _this.playDot();
         })
-        this.playDot(); //在动画之后执行
         this.isAnimate = false;
       }
+
       Carousel.prototype.playNext = function(n){
         var _this = this;
+        var n = n || 1;
         if(this.isAnimate) return; //状态锁，防止重复点击
         this.isAnimate = true;
         this.$imgList.animate({
-          left: '-=' + $imgWidth*n //不相邻的图片距离
+          left: '-=' + this.$imgWidth*n //不相邻的图片距离
         },function(){
           _this.curPageIndex += n;
-          console.log(_this.imgLength)
           if(_this.curPageIndex === _this.imgLength){ //当滚到最后一张之后
-            _this.$imgList.css({'left': -$imgWidth}); //回到第一张图片
+            _this.$imgList.css({'left': -_this.$imgWidth}); //回到第一张图片
             _this.curPageIndex = 0;
           }
+          _this.playDot();
         })
         this.isAnimate = false;
-        this.playDot(); //在动画之后执行
       }
+
       Carousel.prototype.playDot = function(){
-        var _this = this;
-        //console.log(this.curPageIndex)
-        _this.$dot.children().removeClass('active')
-            .eq(_this.curPageIndex).addClass('active') //链式调用
+        this.$dot.children().removeClass('active')
+            .eq(this.curPageIndex).addClass('active') //链式调用
       }
+
+
       _Carousel = (function(){
         return {
             init: function($ct){
